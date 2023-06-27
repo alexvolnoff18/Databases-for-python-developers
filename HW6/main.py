@@ -1,39 +1,18 @@
-
-
 import sqlalchemy
-from sqlalchemy.orm import sessionmaker
-import json
-
-from models import create_tables, Publisher, Sale, Book, Stock, Shop
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from models import Publisher, Book, Shop, Stock, Sale
 
 
-SQLsystem = 'postgresql'
-login = 'postgres'
-password = '8z6f9bNQ4B+'
-host = 'localhost'
-port = 5432
-db_name = "test"
-DSN = f'{SQLsystem}://{login}:{password}@{host}:{port}/{db_name}'
+Base = declarative_base()
+
+DSN = "postgresql://postgres:wsxzaq!1@localhost:5432/HomeWork6"
 engine = sqlalchemy.create_engine(DSN)
 
 Session = sessionmaker(bind=engine)
 session = Session()
 
-create_tables(engine)
 
-with open('tests_data.json', 'r') as db:
-    data = json.load(db)
 
-for line in data:
-    method = {
-        'publisher': Publisher,
-        'shop': Shop,
-        'book': Book,
-        'stock': Stock,
-        'sale': Sale,
-    }[line['model']]
-    session.add(method(id=line['pk'], **line.get('fields')))
-    
 def searching_publisher_name():
     query_join = session.query(Shop).join(Stock).join(Book).join(Publisher)
     query_publisher_name = input('Введите имя (name) издателя: ')
@@ -56,4 +35,5 @@ if __name__ == '__main__':
     searching_publisher_name()
     searching_publisher_id()
 
-session.commit()
+
+session.close()
